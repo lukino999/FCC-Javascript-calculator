@@ -1,0 +1,30 @@
+.display__container {
+  width: 90%;
+  height: 15%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+.display {
+  width: 90%;
+  height: 50%;
+  margin: auto;
+  background-color: #BBB;
+  color: #222;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.display-text {
+  font-family: 'VT323', monospace;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 5vmin;
+  margin: 0;
+}

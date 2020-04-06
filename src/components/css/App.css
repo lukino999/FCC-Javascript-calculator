@@ -1,0 +1,12 @@
+.outer-container {
+  width: 400px;
+  height: 600px;
+  margin: auto;
+}
+
+.calculator {
+  background-color: bisque;
+  width: 100%;
+  height: 100%;
+  border-radius: 5%;
+}
