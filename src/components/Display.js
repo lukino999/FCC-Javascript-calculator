@@ -14,13 +14,20 @@ const Display = (props) => {
   );
 }
 
-const logStack = (stack) => {
-  const text = stack.map(o => `\n${o.type}: ${o.value}`).toString();
+const logState = (state) => {
+  const text = state.buffer.stack.map(o => `\n${o.type}: ${o.value}`).toString();
   console.log('stack --------', text);
+
+  const { buffer, stack, ...rest } = { ...state.buffer }
+  console.log('buffer:', buffer);
+  console.log('flags: ', rest);
+
+  console.log('\n');
+
 }
 
 const mapState = (state) => {
-  logStack(state.buffer.stack);
+  logState(state);
   return {
     buffer: state.buffer.buffer
   }
