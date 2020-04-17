@@ -31,7 +31,7 @@ const INITIAL_STATE = {
   zeroIsAllowed: false,
   decimalIsAllowed: true,
   bufferToBeResetted: false,
-  addIsAllowed: true
+  opIsAllowed: true
 };
 
 
@@ -43,16 +43,23 @@ export default (state = INITIAL_STATE, action) => {
     zeroIsAllowed,
     decimalIsAllowed,
     bufferToBeResetted,
-    addIsAllowed
+    opIsAllowed
   } = state;
 
+  // temp var
+  let flags = {};
+  let bufferOld = '';
+
   switch (action.type) {
+
     //
     case CLEAR:
       return INITIAL_STATE;
 
 
-    //
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     case ONE:
     case TWO:
     case THREE:
@@ -62,57 +69,113 @@ export default (state = INITIAL_STATE, action) => {
     case SEVEN:
     case EIGHT:
     case NINE:
-      let bufferOld;
       bufferOld = buffer === '0' ? '' : buffer;
-      if (bufferToBeResetted) bufferOld = '';
+
+      if (bufferToBeResetted) {
+        bufferOld = '';
+        flags = { bufferToBeResetted: false, decimalIsAllowed: true, opIsAllowed: true }
+      }
+
       return {
         ...state,
+        ...flags,
         buffer: bufferOld + action.text,
-        bufferToBeResetted: false,
-        addIsAllowed: true
+        zeroIsAllowed: true
       }
 
 
-    //
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     case ZERO:
-      if (zeroIsAllowed) return {
-        ...state,
-        buffer: buffer + action.text,
-        addIsAllowed: true
+      if (bufferToBeResetted) {
+        return {
+          ...INITIAL_STATE,
+          stack: stack
+        }
+      };
+      if (zeroIsAllowed) {
+        return {
+          ...state,
+          buffer: buffer + '0'
+        }
       }
-      else return state;
+      return state;
 
 
-    //
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     case DECIMAL:
-      if (decimalIsAllowed) return {
-        ...state,
-        buffer: buffer + action.text,
-        decimalIsAllowed: false,
-        zeroIsAllowed: true,
-        addIsAllowed: true
+      if (decimalIsAllowed && bufferToBeResetted) {
+        return {
+          ...state,
+          buffer: '0.',
+          bufferToBeResetted: false,
+          decimalIsAllowed: false,
+          opIsAllowed: true
+        }
       }
-      else return state
+      if (decimalIsAllowed && !bufferToBeResetted) {
+        return {
+          ...state,
+          buffer: buffer + '.',
+          decimalIsAllowed: false,
+          opIsAllowed: true
+        }
+      }
+      return state;
 
 
-    //
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     case ADD:
-      if (addIsAllowed) return {
-        ...state,
-        stack: [
-          ...stack,
-          { type: VAL, value: buffer },
-          { type: OP, value: action.type }
-        ],
-        zeroIsAllowed: false,
-        decimalIsAllowed: true,
-        bufferToBeResetted: true,
-        addIsAllowed: false
+    case SUBTRACT:
+    case MULTIPLY:
+    case DIVIDE:
+      if (opIsAllowed && !bufferToBeResetted) {
+        console.log('opIsAllowed && !bufferToBeResetted');
+        return {
+          ...state,
+          stack: [
+            ...stack,
+            { type: VAL, value: buffer },
+            { type: OP, value: action.type }
+          ],
+          zeroIsAllowed: true,
+          bufferToBeResetted: true,
+          hasBufferBeenReset: false,
+          opIsAllowed: false,
+          decimalIsAllowed: true
+        }
       }
-      else return state;
+
+      if (opIsAllowed && bufferToBeResetted) {
+        console.log('opIsAllowed && bufferToBeResetted');
+        return {
+          ...state,
+          stack: stack.pop().push(
+            { type: VAL, value: buffer },
+            { type: OP, value: action.type }
+          )
+        }
+      }
+
+      return state;
 
 
-    //
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // test
+    case EQUALS:
+      return state;
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     default:
       return state;
   }
