@@ -1,33 +1,27 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import './css/Keypad.css';
 import keyMapping from '../mapping/keyMapping';
-import { keypress } from '../actions';
+import Key from './Key';
 
 function KeyPad(props) {
 
 
+  //
   const renderKeys = () => {
     let keys = [];
     for (let i = 0; i < 17; i++) {
-      const { id, text, action } = keyMapping[i];
+      const keyMap = keyMapping[i];
       keys.push(
-        <div key={id} className='key-container'>
-          <div
-            id={id}
-            className='key'
-            onClick={() => props.keypress(action, text)}
-          >
-            <p>
-              {text}
-            </p>
-          </div>
-        </div>
+        <Key
+          keyMapping={keyMap}
+          key={keyMap.id}
+        />
       );
     }
     return keys;
   }
 
+  //
   return (
     <div className='keypad-container'>
       <div className='keys'>
@@ -38,4 +32,5 @@ function KeyPad(props) {
   )
 }
 
-export default connect(null, { keypress })(KeyPad);
+// export default connect(null, { keypress })(KeyPad);
+export default KeyPad;

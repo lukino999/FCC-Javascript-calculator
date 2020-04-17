@@ -36,6 +36,21 @@
   justify-content: center;
   align-items: center;
   border-radius: 5%;
+  cursor: pointer;
+  animation-duration: .05s;
 }
 
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 
+}
+
+.bounceIn {
+  animation-timing-function: ease-out;
+  animation-name: bounceIn;
+}
