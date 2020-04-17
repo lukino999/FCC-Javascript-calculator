@@ -16,7 +16,6 @@ const Display = (props) => {
 
 
 const mapState = (state) => {
-  console.log('state', state);
   return {
     buffer: state.buffer.buffer
   }

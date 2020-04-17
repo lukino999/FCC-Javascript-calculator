@@ -17,14 +17,15 @@
   color: #222;
   border-radius: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
 }
 
 .display-text {
   font-family: 'VT323', monospace;
   text-transform: uppercase;
-  text-align: center;
+  text-align: right;
   font-size: 5vmin;
   margin: 0;
+  padding-right: 10px;
 }

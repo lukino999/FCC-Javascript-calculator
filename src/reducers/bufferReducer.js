@@ -17,7 +17,6 @@ import {
   DIVIDE,
   EQUALS
 } from '../actions/types';
-import keyMapping from '../mapping/keyMapping';
 
 const INITIAL_STATE = {
   buffer: '0',
@@ -43,7 +42,7 @@ export default (state = INITIAL_STATE, action) => {
     case SEVEN:
     case EIGHT:
     case NINE:
-      let existing = buffer == '0' ? '' : buffer;
+      const existing = buffer === '0' ? '' : buffer;
       return {
         ...state,
         buffer: existing + action.text,
