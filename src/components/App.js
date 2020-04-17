@@ -7,7 +7,7 @@ const App = () => {
   return (
     <div className='outer-container'>
       <div className='calculator'>
-        <Display text={'Display'} />
+        <Display />
         <Keypad />
       </div>
     </div>
