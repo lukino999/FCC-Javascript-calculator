@@ -14,11 +14,11 @@ const Display = (props) => {
   );
 }
 
-const logState = (state) => {
-  const text = state.buffer.stack.map(o => `\n${o.type}: ${o.value}`).toString();
+export const logState = (state) => {
+  const text = state.stack.map(o => `\n${o.type}: ${o.value}`).toString();
   console.log('stack --------', text);
 
-  const { buffer, stack, ...rest } = { ...state.buffer }
+  const { buffer, stack, ...rest } = { ...state }
   console.log('buffer:', buffer);
   console.log('flags: ', rest);
 
@@ -29,7 +29,7 @@ const logState = (state) => {
 const mapState = (state) => {
   logState(state);
   return {
-    buffer: state.buffer.buffer
+    buffer: state.buffer
   }
 }
 export default connect(mapState)(Display);
