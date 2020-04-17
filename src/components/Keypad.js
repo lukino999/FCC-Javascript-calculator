@@ -1,6 +1,6 @@
 import './css/Keypad.css';
 import React from 'react';
-import keyMapping from './keyMapping';
+import keyMapping from '../mapping/keyMapping';
 
 export default function KeyPad(props) {
 
