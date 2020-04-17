@@ -14,8 +14,13 @@ const Display = (props) => {
   );
 }
 
+const logStack = (stack) => {
+  const text = stack.map(o => `\n${o.type}: ${o.value}`).toString();
+  console.log('stack --------', text);
+}
 
 const mapState = (state) => {
+  logStack(state.buffer.stack);
   return {
     buffer: state.buffer.buffer
   }

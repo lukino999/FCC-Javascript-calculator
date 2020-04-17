@@ -18,19 +18,39 @@ import {
   EQUALS
 } from '../actions/types';
 
+
+// STACK CONSTANTS
+const VAL = 'VAL';
+const OP = 'OP';
+
+
+//
 const INITIAL_STATE = {
   buffer: '0',
+  stack: [],
   zeroIsAllowed: false,
-  decimalIsAllowed: true
+  decimalIsAllowed: true,
+  bufferToBeResetted: false,
+  addIsAllowed: true
 };
 
-export default (state = INITIAL_STATE, action) => {
-  const { buffer, zeroIsAllowed, decimalIsAllowed } = state;
-  switch (action.type) {
 
+export default (state = INITIAL_STATE, action) => {
+
+  const {
+    buffer,
+    stack,
+    zeroIsAllowed,
+    decimalIsAllowed,
+    bufferToBeResetted,
+    addIsAllowed
+  } = state;
+
+  switch (action.type) {
     //
     case CLEAR:
       return INITIAL_STATE;
+
 
     //
     case ONE:
@@ -42,26 +62,26 @@ export default (state = INITIAL_STATE, action) => {
     case SEVEN:
     case EIGHT:
     case NINE:
-      const existing = buffer === '0' ? '' : buffer;
+      let bufferOld;
+      bufferOld = buffer === '0' ? '' : buffer;
+      if (bufferToBeResetted) bufferOld = '';
       return {
         ...state,
-        buffer: existing + action.text,
-        zeroIsAllowed: true
+        buffer: bufferOld + action.text,
+        bufferToBeResetted: false,
+        addIsAllowed: true
       }
+
 
     //
     case ZERO:
-      if (zeroIsAllowed) {
-        if (!buffer) return {
-          ...state,
-          buffer: buffer + action.text,
-          zeroIsAllowed: false
-        }
-        else return {
-          ...state,
-          buffer: buffer + action.text,
-        }
+      if (zeroIsAllowed) return {
+        ...state,
+        buffer: buffer + action.text,
+        addIsAllowed: true
       }
+      else return state;
+
 
     //
     case DECIMAL:
@@ -69,10 +89,30 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         buffer: buffer + action.text,
         decimalIsAllowed: false,
-        zeroIsAllowed: true
+        zeroIsAllowed: true,
+        addIsAllowed: true
       }
+      else return state
 
 
+    //
+    case ADD:
+      if (addIsAllowed) return {
+        ...state,
+        stack: [
+          ...stack,
+          { type: VAL, value: buffer },
+          { type: OP, value: action.type }
+        ],
+        zeroIsAllowed: false,
+        decimalIsAllowed: true,
+        bufferToBeResetted: true,
+        addIsAllowed: false
+      }
+      else return state;
+
+
+    //
     default:
       return state;
   }
