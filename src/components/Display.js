@@ -15,8 +15,9 @@ const Display = (props) => {
 }
 
 export const logState = (state) => {
-  const text = state.stack.map(o => `\n${o.type}: ${o.value}`).toString();
-  console.log('stack --------', text);
+  console.log('\nstate', state);
+  const text = state.stack.map(o => `\n| ${o.type}: ${o.value}`).toString();
+  console.log('++stack+++++++', text, '\n++stack_end+++');
 
   const { buffer, stack, ...rest } = { ...state }
   console.log('buffer:', buffer);
