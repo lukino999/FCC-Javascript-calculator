@@ -33,8 +33,9 @@ const INITIAL_STATE = {
   stack: [],
   zeroIsAllowed: false,
   decimalIsAllowed: true,
-  bufferToBeResetted: false,
+  bufferHasToBeReset: false,
   opIsAllowed: true,
+  lastEntryWasOp: false,
   immediateExecutionLogic: true
 };
 
@@ -46,13 +47,15 @@ export default (state = INITIAL_STATE, action) => {
     stack,
     zeroIsAllowed,
     decimalIsAllowed,
-    bufferToBeResetted,
-    opIsAllowed
+    bufferHasToBeReset,
+    opIsAllowed,
+    lastEntryWasOp
   } = state;
 
   // temp var
   let flags = {};
   let bufferOld = '';
+  let common = {};
 
   switch (action.type) {
 
@@ -75,16 +78,17 @@ export default (state = INITIAL_STATE, action) => {
     case NINE:
       bufferOld = buffer === '0' ? '' : buffer;
 
-      if (bufferToBeResetted) {
+      if (bufferHasToBeReset) {
         bufferOld = '';
-        flags = { bufferToBeResetted: false, decimalIsAllowed: true, opIsAllowed: true }
+        flags = { bufferHasToBeReset: false, decimalIsAllowed: true, opIsAllowed: true }
       }
 
       return {
         ...state,
         ...flags,
         buffer: bufferOld + action.text,
-        zeroIsAllowed: true
+        zeroIsAllowed: true,
+        lastEntryWasOp: false
       }
 
 
@@ -92,16 +96,19 @@ export default (state = INITIAL_STATE, action) => {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     case ZERO:
-      if (bufferToBeResetted) {
+      common = { lastEntryWasOp: false }
+      if (bufferHasToBeReset) {
         return {
           ...INITIAL_STATE,
-          stack: stack
+          stack: stack,
+          ...common
         }
       };
       if (zeroIsAllowed) {
         return {
           ...state,
-          buffer: buffer + '0'
+          buffer: buffer + '0',
+          ...common
         }
       }
       return state;
@@ -111,16 +118,20 @@ export default (state = INITIAL_STATE, action) => {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     case DECIMAL:
-      if (decimalIsAllowed && bufferToBeResetted) {
+      common = {
+        decimalIsAllowed: false,
+        opIsAllowed: true,
+        lastEntryWasOp: false
+      }
+      if (decimalIsAllowed && bufferHasToBeReset) {
         return {
           ...state,
           buffer: '0.',
-          bufferToBeResetted: false,
-          decimalIsAllowed: false,
-          opIsAllowed: true
+          bufferHasToBeReset: false,
+          ...common
         }
       }
-      if (decimalIsAllowed && !bufferToBeResetted) {
+      if (decimalIsAllowed && !bufferHasToBeReset) {
         return {
           ...state,
           buffer: buffer + '.',
@@ -134,12 +145,13 @@ export default (state = INITIAL_STATE, action) => {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
     case ADD:
     case SUBTRACT:
     case MULTIPLY:
     case DIVIDE:
-      if (opIsAllowed && !bufferToBeResetted) {
-        console.log('opIsAllowed && !bufferToBeResetted');
+      if (opIsAllowed) {
+        console.log('opIsAllowed && !bufferHasToBeReset');
         return {
           ...state,
           stack: [
@@ -148,21 +160,26 @@ export default (state = INITIAL_STATE, action) => {
             { type: OP, value: action.type }
           ],
           zeroIsAllowed: true,
-          bufferToBeResetted: true,
-          hasBufferBeenReset: false,
+          bufferHasToBeReset: true,
           opIsAllowed: false,
-          decimalIsAllowed: true
+          decimalIsAllowed: true,
+          lastEntryWasOp: true
         }
       }
 
-      if (opIsAllowed && bufferToBeResetted) {
-        console.log('opIsAllowed && bufferToBeResetted');
+      if (lastEntryWasOp && action.type === SUBTRACT) {
         return {
           ...state,
-          stack: stack.pop().push(
-            { type: VAL, value: buffer },
-            { type: OP, value: action.type }
-          )
+          buffer: '-',
+          bufferHasToBeReset: false,
+        }
+      }
+
+      if (lastEntryWasOp) {
+        console.log('!opIsAllowed && lastEntryWasOp');
+        return {
+          ...state,
+          stack: [...stack.slice(0, -1), { type: OP, value: action.type }]
         }
       }
 
@@ -174,7 +191,11 @@ export default (state = INITIAL_STATE, action) => {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // test
     case EQUALS:
-    //return calculate(state);
+      return {
+        ...INITIAL_STATE,
+        bufferHasToBeReset: true,
+        buffer: calculate(state)
+      }
 
 
 
@@ -183,4 +204,55 @@ export default (state = INITIAL_STATE, action) => {
     default:
       return state;
   }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+const calculate = (state) => {
+
+  // return result
+
+  console.log('\n--------------\n------- EQUALS');
+
+  const stack = [...state.stack, { type: VAL, value: state.buffer }];
+
+  if (state.immediateExecutionLogic) {
+    console.log('immediateExecution');
+
+    console.log('\nloop');
+    while (stack.length > 1) {
+      const firstOperand = parseFloat(stack.shift().value);
+      const op = (stack.shift()).value;
+      const secondOperand = parseFloat((stack.shift()).value);
+      console.log(`${firstOperand}, ${op}, ${secondOperand}`);
+      console.log('stack', stack);
+
+      let res = 0;
+
+      switch (op) {
+        case ADD:
+          res = firstOperand + secondOperand;
+          break;
+
+        case SUBTRACT:
+          res = firstOperand - secondOperand;
+          break;
+
+        case MULTIPLY:
+          res = firstOperand * secondOperand;
+          break;
+
+        case DIVIDE:
+          res = firstOperand / secondOperand;
+          break;
+
+      }
+
+      stack.unshift({ type: VAL, value: res })
+
+    }
+  }
+
+  // unreacheble... remove!!
+  return stack[0].value
 }
