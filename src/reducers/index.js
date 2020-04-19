@@ -22,10 +22,10 @@ import {
 } from '../actions/types';
 
 
-// STACK CONSTANTS
+// CONSTANTS
 const VAL = 'VAL';
 const OP = 'OP';
-
+const PRECISION = 16
 
 //
 const INITIAL_STATE = {
@@ -64,6 +64,7 @@ export default (state = INITIAL_STATE, action) => {
         display: res
       }
 
+    //
     case SUBTRACT:
       if (lastEntryWasOp && (stack[stack.length - 1] === SUBTRACT)) {
         return state;
@@ -109,6 +110,8 @@ export default (state = INITIAL_STATE, action) => {
 
     //
     case DECIMAL:
+      if (isTooLong(temp)) return state;
+
       if (lastEntryWasOp) {
         return {
           ...state,
@@ -151,6 +154,8 @@ export default (state = INITIAL_STATE, action) => {
 
     //
     case ZERO:
+      if (isTooLong(temp)) return state;
+
       if (!zeroIsAllowed) {
         return state;
       }
@@ -159,7 +164,6 @@ export default (state = INITIAL_STATE, action) => {
         return {
           ...state,
           display: '0',
-          temp: '0',
           zeroIsAllowed: false
         }
       }
@@ -182,6 +186,8 @@ export default (state = INITIAL_STATE, action) => {
     case SEVEN:
     case EIGHT:
     case NINE:
+      if (isTooLong(temp)) return state;
+
       if (lastEntryWasOp) {
         return {
           ...state,
@@ -255,6 +261,13 @@ const calculate = (state) => {
     }
   }
 
-  // unreacheble... remove!!
   return stack[0].value
+}
+
+function isTooLong(string) {
+  let temp = string[0] === '-' ? string.split('-')[1] : string;
+  const [integer, decimal] = (temp).split('.');
+  let digits = decimal ? integer.length + decimal.length : integer.length;
+  digits = integer === '0' ? digits - 1 : digits;
+  return digits >= PRECISION;
 }
