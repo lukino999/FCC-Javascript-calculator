@@ -2,10 +2,32 @@ import './css/Display.css';
 import React from 'react';
 import { connect } from 'react-redux';
 
+const renderExecution = (instant) => {
+  if (instant) {
+    return (
+      <>
+        <span>IMMEDIATE </span >
+        <span className='hidden'>FORMULA</span>
+      </>
+    )
+  } else {
+    return (
+      <>
+        <span className='hidden'>IMMEDIATE </span >
+        <span >FORMULA</span>
+      </>
+    )
+  }
+}
+
 const Display = (props) => {
+
   return (
     <div className='display__container'>
       <div className='display'>
+        <div className='display-mode'>
+          {renderExecution(props.instant)}
+        </div>
         <p id='display' className='display-text'>
           {props.display}
         </p>
@@ -31,7 +53,8 @@ export const logState = (state) => {
 const mapState = (state) => {
   logState(state);
   return {
-    display: state.display
+    display: state.display,
+    instant: state.immediateExecutionLogic
   }
 }
 export default connect(mapState)(Display);
