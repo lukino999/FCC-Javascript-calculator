@@ -51,7 +51,7 @@ export const logState = (state) => {
 }
 
 const mapState = (state) => {
-  logState(state);
+  // logState(state);
   return {
     display: state.display,
     instant: state.immediateExecutionLogic

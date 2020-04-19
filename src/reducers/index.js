@@ -41,7 +41,7 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
 
-  console.log('Action: ', action.type);
+  // console.log('Action: ', action.type);
 
   const {
     temp,
@@ -226,18 +226,14 @@ export default (state = INITIAL_STATE, action) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 const calculate = (state) => {
 
-  // return result
-
-  console.log('EQUALS');
-
   const stack = [...state.stack, { type: VAL, value: parseFloat(state.display) }];
 
-  logState({ stack });
+  // logState({ stack });
 
   if (state.immediateExecutionLogic) {
     // immediate execution logic:
     // the operation are executed in the order they've been entered
-    console.log('immediateExecution');
+    // console.log('immediateExecution');
 
     while (stack.length > 2) {
       const firstOperand = stack.shift().value;
@@ -264,7 +260,7 @@ const calculate = (state) => {
       }
 
       stack.unshift({ type: VAL, value: res })
-      logState({ stack });
+      // logState({ stack });
     }
   } else {
     // formula logic:
@@ -279,12 +275,12 @@ const calculate = (state) => {
         const secondOperand = stack[i + 1].value;
 
         res = (op === MULTIPLY) ? (firstOperand * secondOperand) : (firstOperand / secondOperand);
-        console.log(`Operation: ${firstOperand} ${op} ${secondOperand} = ${res} `);
+        // console.log(`Operation: ${firstOperand} ${op} ${secondOperand} = ${res} `);
         stack.splice(i - 1, 3, { type: VAL, value: res });
       } else {
         i += 2;
       }
-      logState({ i: i, stack });
+      // logState({ i: i, stack });
     }
 
     // now execute all ADDs and SUBTRACTs
@@ -295,7 +291,7 @@ const calculate = (state) => {
       const secondOperand = stack[2].value;
       res = (op === ADD) ? (firstOperand + secondOperand) : (firstOperand - secondOperand);
       stack.splice(0, 3, { type: VAL, value: res });
-      logState({ stack });
+      // logState({ stack });
     }
   }
 

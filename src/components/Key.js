@@ -29,7 +29,6 @@ function Key(props) {
         className='key bounceIn'
         ref={ref => keyRef = ref}
         onClick={() => handleKeypress(action, text, keyRef)}
-
       >
         <p>
           {text}
