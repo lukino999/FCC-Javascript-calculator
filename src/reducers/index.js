@@ -48,25 +48,30 @@ export default (state = INITIAL_STATE, action) => {
     stack,
     display,
     lastEntryWasOp,
-    zeroIsAllowed
+    zeroIsAllowed,
+    immediateExecutionLogic
   } = state;
 
   switch (action.type) {
     case MODE:
       return {
         ...state,
-        immediateExecutionLogic: !state.immediateExecutionLogic
+        immediateExecutionLogic: !immediateExecutionLogic
       }
 
     //
     case CLEAR:
-      return INITIAL_STATE;
+      return {
+        ...INITIAL_STATE,
+        immediateExecutionLogic: immediateExecutionLogic
+      };
 
     //
     case EQUALS:
       let res = calculate(state);
       return {
         ...INITIAL_STATE,
+        immediateExecutionLogic: immediateExecutionLogic,
         display: res
       }
 
