@@ -75,6 +75,14 @@ export default (state = INITIAL_STATE, action) => {
         }
       }
 
+      if (display === '0') {
+        return {
+          ...state,
+          temp: '-',
+          display: '-'
+        }
+      }
+
     //
     case ADD:
     case MULTIPLY:
@@ -120,6 +128,15 @@ export default (state = INITIAL_STATE, action) => {
           ...state,
           display: '0.',
           temp: '0.',
+          zeroIsAllowed: true
+        }
+      }
+
+      if (display === '-') {
+        return {
+          ...state,
+          display: '-0.',
+          temp: '-0.',
           zeroIsAllowed: true
         }
       }
