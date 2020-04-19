@@ -221,17 +221,17 @@ const calculate = (state) => {
 
   const stack = [...state.stack, { type: VAL, value: parseFloat(state.display) }];
 
-  logState({ ...state, stack });
+  logState({ stack });
 
   if (state.immediateExecutionLogic) {
+    // immediate execution logic:
+    // the operation are executed in the order they've been entered
     console.log('immediateExecution');
 
-    while (stack.length > 1) {
+    while (stack.length > 2) {
       const firstOperand = stack.shift().value;
       const op = stack.shift().value;
       const secondOperand = stack.shift().value;
-      console.log(`Operation: ${firstOperand}, ${op}, ${secondOperand}`);
-
       let res = 0;
 
       switch (op) {
@@ -250,19 +250,48 @@ const calculate = (state) => {
         case DIVIDE:
           res = firstOperand / secondOperand;
           break;
-
       }
 
       stack.unshift({ type: VAL, value: res })
+      logState({ stack });
+    }
+  } else {
+    // formula logic:
 
-      logState({ ...state, stack });
+    // first execute all MULTIPLYs and DIVIDEs
+    let i = 1
+    while (stack.length > i) {
+      let res;
+      const op = stack[i].value;
+      if ((op === MULTIPLY) || (op === DIVIDE)) {
+        const firstOperand = stack[i - 1].value;
+        const secondOperand = stack[i + 1].value;
 
+        res = (op === MULTIPLY) ? (firstOperand * secondOperand) : (firstOperand / secondOperand);
+        console.log(`Operation: ${firstOperand} ${op} ${secondOperand} = ${res} `);
+        stack.splice(i - 1, 3, { type: VAL, value: res });
+      } else {
+        i += 2;
+      }
+      logState({ i: i, stack });
+    }
 
+    // now execute all ADDs and SUBTRACTs
+    while (stack.length >= 3) {
+      let res;
+      const firstOperand = stack[0].value;
+      const op = stack[1].value;
+      const secondOperand = stack[2].value;
+      res = (op === ADD) ? (firstOperand + secondOperand) : (firstOperand - secondOperand);
+      stack.splice(0, 3, { type: VAL, value: res });
+      logState({ stack });
     }
   }
 
+  // 
   return stack[0].value
 }
+
 
 function isTooLong(string) {
   let temp = string[0] === '-' ? string.split('-')[1] : string;
