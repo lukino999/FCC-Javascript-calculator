@@ -25,7 +25,9 @@ function KeyPad(props) {
   return (
     <div className='keypad-container'>
       <div className='keys'>
-        <div className='logo'>FCC CALC</div>
+        <div className='logo'>
+          <i className="fab fa-free-code-camp"></i>
+        </div>
         {renderKeys()}
       </div>
     </div>
