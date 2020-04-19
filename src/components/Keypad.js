@@ -9,7 +9,7 @@ function KeyPad(props) {
   //
   const renderKeys = () => {
     let keys = [];
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < keyMapping.length; i++) {
       const keyMap = keyMapping[i];
       keys.push(
         <Key
@@ -25,7 +25,7 @@ function KeyPad(props) {
   return (
     <div className='keypad-container'>
       <div className='keys'>
-        <div className='logo'>Logo</div>
+        <div className='logo'>FCC CALC</div>
         {renderKeys()}
       </div>
     </div>

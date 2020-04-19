@@ -2,6 +2,7 @@
 import { logState } from '../components/Display'
 
 import {
+  MODE,
   CLEAR,
   ZERO,
   ONE,
@@ -51,6 +52,11 @@ export default (state = INITIAL_STATE, action) => {
   } = state;
 
   switch (action.type) {
+    case MODE:
+      return {
+        ...state,
+        immediateExecutionLogic: !state.immediateExecutionLogic
+      }
 
     //
     case CLEAR:

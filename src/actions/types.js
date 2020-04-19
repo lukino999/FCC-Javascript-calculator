@@ -1,3 +1,4 @@
+export const MODE = 'MODE';
 export const CLEAR = 'CLEAR';
 export const SEVEN = 'SEVEN';
 export const EIGHT = 'EIGHT';

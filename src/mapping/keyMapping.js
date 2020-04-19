@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  CLEAR,
+  MODE, CLEAR,
   SEVEN, EIGHT, NINE, DIVIDE,
   FOUR, FIVE, SIX, MULTIPLY,
   ONE, TWO, THREE, SUBTRACT,
@@ -9,6 +9,7 @@ import {
 
 //
 const keyMapping = [
+  { id: 'mode', text: <i className="fas fa-cog op-font-size"></i>, action: MODE },
   { id: 'clear', text: 'C', action: CLEAR },
   { id: 'seven', text: '7', action: SEVEN },
   { id: 'eight', text: '8', action: EIGHT },
