@@ -1,5 +1,5 @@
 # Javascript calculator
-## [Live on Github Pages](https://lukino999.github.io/FCC-Javascript-calculator)
+## [Live on Github Pages](https://lukino999.github.io/FCC-JavaScript-calculator)
 <hr>
 <hr>
 

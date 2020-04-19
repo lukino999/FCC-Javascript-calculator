@@ -1,6 +1,6 @@
 {
-  "homepage": "https://lukino999.github.io/FCC-Javascript-calculator",
   "name": "build-a-javascript-calculator",
+  "homepage": "https://lukino999.github.io/FCC-JavaScript-calculator",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
