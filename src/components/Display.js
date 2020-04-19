@@ -7,7 +7,7 @@ const Display = (props) => {
     <div className='display__container'>
       <div className='display'>
         <p id='display' className='display-text'>
-          {props.buffer}
+          {props.display}
         </p>
       </div>
     </div>
@@ -15,22 +15,23 @@ const Display = (props) => {
 }
 
 export const logState = (state) => {
-  console.log('\nstate', state);
-  const text = state.stack.map(o => `\n| ${o.type}: ${o.value}`).toString();
-  console.log('++stack+++++++', text, '\n++stack_end+++');
 
-  const { buffer, stack, ...rest } = { ...state }
-  console.log('buffer:', buffer);
-  console.log('flags: ', rest);
+  const { display, temp, stack, ...rest } = { ...state };
 
-  console.log('\n');
+  const text = stack.map(o => `\n| ${o.type}: ${o.value}`).toString();
+
+  console.log('\n state: ', state,
+    '\n', '\n', '++stack+++++++', text, '\n ++stack_end+++\n ',
+    '\n', 'flags: ', rest,
+    '\n \n '
+  );
 
 }
 
 const mapState = (state) => {
   logState(state);
   return {
-    buffer: state.buffer
+    display: state.display
   }
 }
 export default connect(mapState)(Display);

@@ -29,12 +29,10 @@ const OP = 'OP';
 
 //
 const INITIAL_STATE = {
-  buffer: '0',
+  display: '0',
+  temp: '',
   stack: [],
   zeroIsAllowed: false,
-  decimalIsAllowed: true,
-  bufferHasToBeReset: false,
-  opIsAllowed: true,
   lastEntryWasOp: false,
   immediateExecutionLogic: true
 };
@@ -42,20 +40,15 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
 
-  const {
-    buffer,
-    stack,
-    zeroIsAllowed,
-    decimalIsAllowed,
-    bufferHasToBeReset,
-    opIsAllowed,
-    lastEntryWasOp
-  } = state;
+  console.log('Action: ', action.type);
 
-  // temp var
-  let flags = {};
-  let bufferOld = '';
-  let common = {};
+  const {
+    temp,
+    stack,
+    display,
+    lastEntryWasOp,
+    zeroIsAllowed
+  } = state;
 
   switch (action.type) {
 
@@ -63,10 +56,106 @@ export default (state = INITIAL_STATE, action) => {
     case CLEAR:
       return INITIAL_STATE;
 
+    //
+    case EQUALS:
+      let res = calculate(state);
+      return {
+        ...INITIAL_STATE,
+        display: res
+      }
+
+    case SUBTRACT:
+      if (lastEntryWasOp && (stack[stack.length - 1] === SUBTRACT)) {
+        return state;
+      }
+      if (lastEntryWasOp) {
+        return {
+          ...state,
+          temp: '-'
+        }
+      }
+
+    //
+    case ADD:
+    case MULTIPLY:
+    case DIVIDE:
+    case SUBTRACT:
+      let tempStack;
+      if (lastEntryWasOp) {
+        tempStack = [...stack];
+        tempStack.pop();
+      } else {
+        if (temp === '-') {
+          return state;
+        }
+        tempStack = [...stack, { type: VAL, value: parseFloat(display) }]
+      }
+
+      return {
+        ...state,
+        temp: '',
+        stack: [...tempStack, { type: OP, value: action.type }],
+        lastEntryWasOp: true
+      }
+
+
+    //
+    case DECIMAL:
+      if (lastEntryWasOp) {
+        return {
+          ...state,
+          display: temp + '0.',
+          temp: temp + '0.',
+          lastEntryWasOp: false,
+          zeroIsAllowed: true
+        }
+      }
+
+      if (display.includes('.')) {
+        return state;
+      }
+
+      if (display === '0') {
+        return {
+          ...state,
+          display: '0.',
+          temp: '0.',
+          zeroIsAllowed: true
+        }
+      }
+
+      return {
+        ...state,
+        display: display + '.',
+        temp: display + '.',
+        zeroIsAllowed: true
+      }
+
+
+    //
+    case ZERO:
+      if (!zeroIsAllowed) {
+        return state;
+      }
+
+      if (lastEntryWasOp) {
+        return {
+          ...state,
+          display: '0',
+          temp: '0',
+          zeroIsAllowed: false
+        }
+      }
+
+      return {
+        ...state,
+        display: temp + '0',
+        temp: temp + '0'
+      }
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     case ONE:
     case TWO:
     case THREE:
@@ -76,131 +165,24 @@ export default (state = INITIAL_STATE, action) => {
     case SEVEN:
     case EIGHT:
     case NINE:
-      bufferOld = buffer === '0' ? '' : buffer;
-
-      if (bufferHasToBeReset) {
-        bufferOld = '';
-        flags = { bufferHasToBeReset: false, decimalIsAllowed: true, opIsAllowed: true }
+      if (lastEntryWasOp) {
+        return {
+          ...state,
+          display: temp + action.text,
+          temp: temp + action.text,
+          lastEntryWasOp: false,
+          zeroIsAllowed: true
+        }
       }
 
       return {
         ...state,
-        ...flags,
-        buffer: bufferOld + action.text,
-        zeroIsAllowed: true,
-        lastEntryWasOp: false
+        display: temp + action.text,
+        temp: temp + action.text,
+        zeroIsAllowed: true
       }
 
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    case ZERO:
-      common = { lastEntryWasOp: false }
-      if (bufferHasToBeReset) {
-        return {
-          ...INITIAL_STATE,
-          stack: stack,
-          ...common
-        }
-      };
-      if (zeroIsAllowed) {
-        return {
-          ...state,
-          buffer: buffer + '0',
-          ...common
-        }
-      }
-      return state;
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    case DECIMAL:
-      common = {
-        decimalIsAllowed: false,
-        opIsAllowed: true,
-        lastEntryWasOp: false
-      }
-      if (decimalIsAllowed && bufferHasToBeReset) {
-        return {
-          ...state,
-          buffer: '0.',
-          bufferHasToBeReset: false,
-          ...common
-        }
-      }
-      if (decimalIsAllowed && !bufferHasToBeReset) {
-        return {
-          ...state,
-          buffer: buffer + '.',
-          decimalIsAllowed: false,
-          opIsAllowed: true
-        }
-      }
-      return state;
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    case ADD:
-    case SUBTRACT:
-    case MULTIPLY:
-    case DIVIDE:
-      if (opIsAllowed) {
-        console.log('opIsAllowed && !bufferHasToBeReset');
-        return {
-          ...state,
-          stack: [
-            ...stack,
-            { type: VAL, value: buffer },
-            { type: OP, value: action.type }
-          ],
-          zeroIsAllowed: true,
-          bufferHasToBeReset: true,
-          opIsAllowed: false,
-          decimalIsAllowed: true,
-          lastEntryWasOp: true
-        }
-      }
-
-      if (lastEntryWasOp && action.type === SUBTRACT) {
-        return {
-          ...state,
-          buffer: '-',
-          bufferHasToBeReset: false,
-        }
-      }
-
-      if (lastEntryWasOp) {
-        console.log('!opIsAllowed && lastEntryWasOp');
-        return {
-          ...state,
-          stack: [...stack.slice(0, -1), { type: OP, value: action.type }]
-        }
-      }
-
-      return state;
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // test
-    case EQUALS:
-      return {
-        ...INITIAL_STATE,
-        bufferHasToBeReset: true,
-        buffer: calculate(state)
-      }
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     default:
       return state;
   }
@@ -212,20 +194,20 @@ const calculate = (state) => {
 
   // return result
 
-  console.log('\n--------------\n------- EQUALS');
+  console.log('EQUALS');
 
-  const stack = [...state.stack, { type: VAL, value: state.buffer }];
+  const stack = [...state.stack, { type: VAL, value: parseFloat(state.display) }];
+
+  logState({ ...state, stack });
 
   if (state.immediateExecutionLogic) {
     console.log('immediateExecution');
 
-    console.log('\nloop');
     while (stack.length > 1) {
-      const firstOperand = parseFloat(stack.shift().value);
-      const op = (stack.shift()).value;
-      const secondOperand = parseFloat((stack.shift()).value);
-      console.log(`${firstOperand}, ${op}, ${secondOperand}`);
-      console.log('stack', stack);
+      const firstOperand = stack.shift().value;
+      const op = stack.shift().value;
+      const secondOperand = stack.shift().value;
+      console.log(`Operation: ${firstOperand}, ${op}, ${secondOperand}`);
 
       let res = 0;
 
@@ -249,6 +231,9 @@ const calculate = (state) => {
       }
 
       stack.unshift({ type: VAL, value: res })
+
+      logState({ ...state, stack });
+
 
     }
   }
