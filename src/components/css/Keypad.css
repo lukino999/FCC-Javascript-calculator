@@ -10,6 +10,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 200%;
 }
 
 .keys {
@@ -38,6 +39,20 @@
   border-radius: 5%;
   cursor: pointer;
   animation-duration: .05s;
+
+  font-size: 200%;
+  font-weight: bolder;
+}
+
+.key p {
+  /* background-color: crimson; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.op-font-size {
+  font-size: 80%;
 }
 
 @keyframes bounceIn {
