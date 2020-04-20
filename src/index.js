@@ -10,7 +10,6 @@ const store = createStore(reducers);
 ReactDOM.render(
   <Provider store={store}>
     <App />
-    {/* <div style={{ textAlign: "center" }}>TEST</div> */}
   </Provider>,
   document.querySelector('#root')
 );
