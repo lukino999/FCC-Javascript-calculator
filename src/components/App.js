@@ -10,6 +10,10 @@ const App = () => {
         <Display />
         <Keypad />
       </div>
+      <footer>
+        FreeCodeCamp Javascript Calculator &copy;&nbsp;Luca&nbsp;M&nbsp;-&nbsp;
+        <a href='https://github.com/lukino999/FCC-JavaScript-calculator' target='_blank'>source</a>
+      </footer>
     </div>
   );
 }
